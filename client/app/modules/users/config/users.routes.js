@@ -26,7 +26,13 @@ angular.module('com.module.users')
         url: '',
         templateUrl: 'modules/users/views/list.html',
         controller: 'UsersCtrl',
-        authenticate: true
+        authenticate: true,
+        data:{
+          permissions:{
+            only: ['admin'],
+            redirectTo: 'login'
+          }
+        }
       })
       .state('app.users.add', {
         url: '/add',

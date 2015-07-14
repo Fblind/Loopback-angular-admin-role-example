@@ -42,9 +42,10 @@ angular.module('loopbackApp', [
     'com.module.products',
     'com.module.sandbox',
     'com.module.settings',
-    'com.module.users'
+    'com.module.users',
+    'permission'
   ])
-  .run(function($rootScope, $cookies, gettextCatalog) {
+  .run(function($rootScope, $cookies, gettextCatalog, Permission, Role, User, RoleMapping) {
 
     $rootScope.locales = {
 
@@ -78,6 +79,27 @@ angular.module('loopbackApp', [
     var lang = $cookies.lang || navigator.language || navigator.userLanguage;
 
     $rootScope.locale = $rootScope.locales[lang];
+
+    Permission.defineRole('admin', function(stateParams){
+      return User.getCurrent(function(user) {
+        console.log(user);
+        Role.findOne({
+          filter:{
+            where: {
+              name: 'admin'
+            },
+            include: 'principals'
+        }}, function(role, err){
+          return role.principals.forEach(function(principal){
+            console.log('principal: ', principal.principalId);
+            console.log('user: ', user.id);
+            return parseInt(principal.principalId, 10) === parseInt(user.id, 10);
+          });
+        });
+      }, function(err) {
+        console.log(err);
+      });
+    });
 
     if ($rootScope.locale === undefined) {
       $rootScope.locale = $rootScope.locales[lang];
